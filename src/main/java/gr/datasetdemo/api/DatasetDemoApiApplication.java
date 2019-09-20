@@ -265,4 +265,49 @@ public class DatasetDemoApiApplication {
 		}
 		return new ResponseEntity<>("Dataset deleted successfully", HttpStatus.OK);
 	}
+	
+	@DeleteMapping(value = "/datasets", params = "name")
+	public ResponseEntity<Object> deleteDatasetByName (@RequestParam(required=true) String name){
+		
+		Connection conn = null;
+		try {
+			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/datasetdemo?serverTimezone=UTC", "apostolos", "8lfvl94fubBu");
+
+			String sql = "SELECT payloadId FROM Dataset WHERE name LIKE '"+name+"'";
+			Statement stmt = conn.createStatement(); 
+			ResultSet rs = stmt.executeQuery(sql);
+			rs.next();
+			
+			int payloadId = rs.getInt("payloadId");
+			//Delete from Dataset first
+			sql = "DELETE FROM Dataset WHERE payloadId = ?";
+            
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            
+            pstmt.setInt(1, payloadId);
+            
+            pstmt.executeUpdate();
+            
+            //Delete from Payload
+            sql = "DELETE FROM Payload WHERE id = ?";
+            
+            pstmt = conn.prepareStatement(sql);
+            
+            pstmt.setInt(1, payloadId);
+            
+            pstmt.executeUpdate();
+            
+            //Close Connection
+            rs.close();
+            stmt.close();
+            pstmt.close();
+            conn.close();
+            
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+		return new ResponseEntity<>("Dataset deleted successfully", HttpStatus.OK);
+	}
+	
 }
