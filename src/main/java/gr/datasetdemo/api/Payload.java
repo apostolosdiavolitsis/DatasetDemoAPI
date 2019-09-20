@@ -3,15 +3,15 @@ package gr.datasetdemo.api;
 public class Payload {
 
 	private int id;
-	private String creatDate;
+	private String createDate;
 	private byte[] blob;
 	
 	public Payload() {
 	}
 
-	public Payload(int id, String creatDate, byte[] blob) {
+	public Payload(int id, String createDate, byte[] blob) {
 		this.id = id;
-		this.creatDate = creatDate;
+		this.createDate = createDate;
 		this.blob = blob;
 	}
 
@@ -23,12 +23,12 @@ public class Payload {
 		this.id = id;
 	}
 
-	public String getCreatDate() {
-		return creatDate;
+	public String getCreateDate() {
+		return createDate;
 	}
 
-	public void setCreatDate(String creatDate) {
-		this.creatDate = creatDate;
+	public void setCreateDate(String creatDate) {
+		this.createDate = creatDate;
 	}
 
 	public byte[] getBlob() {
