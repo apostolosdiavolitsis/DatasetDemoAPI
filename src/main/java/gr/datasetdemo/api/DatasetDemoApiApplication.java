@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -308,6 +309,34 @@ public class DatasetDemoApiApplication {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 		return new ResponseEntity<>("Dataset deleted successfully", HttpStatus.OK);
+	}
+	
+	@PutMapping(value = "/datasets")
+	public ResponseEntity<Object> updateDatasetById(@RequestBody Dataset dataset){
+				
+						
+		Connection conn = null;
+		try {
+			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/datasetdemo?serverTimezone=UTC", "apostolos", "8lfvl94fubBu");
+			String sql = "UPDATE Dataset SET name = ?,description = ?  WHERE id= ?";
+
+			PreparedStatement pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setString(1, dataset.getName());
+			pstmt.setString(2, dataset.getDescription());
+			pstmt.setInt(3, dataset.getId());
+			
+			pstmt.executeUpdate();
+			
+            //Close Connection
+            pstmt.close();
+            conn.close();
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+		return new ResponseEntity<>("Dutaset updated successfully", HttpStatus.ACCEPTED);
 	}
 	
 }
