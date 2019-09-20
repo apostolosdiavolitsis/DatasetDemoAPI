@@ -125,4 +125,52 @@ public class DatasetDemoApiApplication {
 		return new ResponseEntity<>(datasetList, HttpStatus.OK);
 	}
 	
+	@GetMapping(value = "/datasets", params = "id")
+	public ResponseEntity<Object> getDatasetById(@RequestParam(required=true) int id,@RequestParam(required=false,defaultValue="false") boolean loadPayloads){
+				
+		ArrayList<Dataset> datasetList = new ArrayList<Dataset>();
+						
+		Connection conn = null;
+		try {
+			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/datasetdemo?serverTimezone=UTC", "apostolos", "8lfvl94fubBu");
+			String sql = "SELECT * FROM Dataset WHERE id="+id;
+			Statement stmt = conn.createStatement(); 
+			ResultSet rs = stmt.executeQuery(sql);
+			
+			while(rs.next()) {
+				Dataset dataset = new Dataset();
+				dataset.setId(rs.getInt("id"));
+				dataset.setName(rs.getString("name"));
+				dataset.setDescription(rs.getString("description"));
+				if(loadPayloads) {
+					String sqlPayloads = "SELECT * FROM Payload WHERE id="+rs.getInt("payloadId");
+					Statement stmt2 = conn.createStatement(); 
+					ResultSet rs2 = stmt2.executeQuery(sqlPayloads);
+					Payload payload = new Payload();
+					rs2.next();
+		            payload.setId(rs2.getInt("id"));
+	            	payload.setCreateDate(rs2.getString("createDate"));
+	            	payload.setBlob(rs2.getBinaryStream("blobData").readAllBytes());
+	            	dataset.setPayload(payload);
+	            	//Close ResultSet
+	            	rs2.close();
+	            	stmt2.close();
+				}
+				datasetList.add(dataset);
+			}
+			//Close Connection
+			rs.close();
+			stmt.close();
+			conn.close();
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+		return new ResponseEntity<>(datasetList, HttpStatus.OK);
+	}
+	
 }
